@@ -16,6 +16,7 @@ namespace WebApi
 {
     public class Startup
     {
+        private readonly string corsPolicyName = "myCustomPolicy";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,17 +29,30 @@ namespace WebApi
         {
             services.AddControllers();
 
-            //infrastructure.managers
+            // infrastructure.managers
             services.AddSingleton<IAppSettingsManager, AppSettingsManager>();
             services.AddSingleton<IDataReciveManager, DataReciveManager>();
 
-            //repos 
+            // repos 
             // инжект общего репозитория для масштабируемости в будущем, лучше заменить на Scoped но нам нужно состояние т.к. нет бд
             services.AddSingleton(typeof(IRepository<>), typeof(GenericRepository<>));
             services.AddSingleton<IRepository<Offer>, OfferRepository>();
 
-            //managers
+            // managers
             services.AddScoped<IOfferManager, OfferManager>();
+
+            // cors
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: corsPolicyName,
+                    builder =>
+                    {
+                        builder.WithOrigins(Configuration.GetValue<string>("DataApiUrl"))
+                            .AllowAnyHeader()
+                            .AllowAnyMethod()
+                            .AllowCredentials();
+                    });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,6 +62,8 @@ namespace WebApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors(corsPolicyName);
 
             app.UseHttpsRedirection();
 
