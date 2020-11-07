@@ -1,17 +1,18 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Domain.Interfaces;
+using Domain.Models;
+using Infrastructure;
+using Infrastructure.Interfaces;
+using Infrastructure.Managers;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Services.Interfaces;
+using Services.Managers;
 
-namespace sozvezdie
+namespace WebApi
 {
     public class Startup
     {
@@ -26,6 +27,18 @@ namespace sozvezdie
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            //infrastructure.managers
+            services.AddSingleton<IAppSettingsManager, AppSettingsManager>();
+            services.AddSingleton<IDataReciveManager, DataReciveManager>();
+
+            //repos 
+            // инжект общего репозитория для масштабируемости в будущем, лучше заменить на Scoped но нам нужно состояние т.к. нет бд
+            services.AddSingleton(typeof(IRepository<>), typeof(GenericRepository<>));
+            services.AddSingleton<IRepository<Offer>, OfferRepository>();
+
+            //managers
+            services.AddScoped<IOfferManager, OfferManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
