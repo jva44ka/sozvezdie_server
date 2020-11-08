@@ -47,7 +47,7 @@ namespace WebApi
                 options.AddPolicy(name: corsPolicyName,
                     builder =>
                     {
-                        builder.WithOrigins(Configuration.GetValue<string>("DataApiUrl"))
+                        builder.WithOrigins(Configuration.GetValue<string>("ClientUrl"))
                             .AllowAnyHeader()
                             .AllowAnyMethod()
                             .AllowCredentials();
@@ -58,18 +58,11 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            app.UseCors(/*corsPolicyName*/builder => builder.AllowAnyOrigin());
 
-            app.UseCors(corsPolicyName);
-
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
