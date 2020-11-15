@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
-using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 using WebApi.ViewModels;
